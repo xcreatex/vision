@@ -40,6 +40,7 @@ def listen_for_command(timeout=5):
                 if rec.AcceptWaveform(data):
                     result = json.loads(rec.Result())
                     result_text = result.get("text", "")
+                    print(result_text)
                     break
         except Exception as e:
             print("❌ Vosk error:", e)

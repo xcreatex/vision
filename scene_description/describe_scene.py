@@ -2,8 +2,12 @@ from PIL import Image
 from transformers import BlipProcessor, BlipForConditionalGeneration
 import torch
 
-processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+# processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+# model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+MODEL_DIR = "./models/blip-image-captioning-base"
+processor = BlipProcessor.from_pretrained(MODEL_DIR)
+model = BlipForConditionalGeneration.from_pretrained(MODEL_DIR)
+
 
 def describe_image(image_path: str) -> str:
     try:
