@@ -1,0 +1,12 @@
+torch
+torchvision
+torchaudio
+transformers
+ultralytics
+opencv-python
+Pillow
+numpy
+sounddevice
+scipy
+vosk
+pyttsx3
