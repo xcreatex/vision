@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import cv2
 
 # Load model once globally
-MODEL_PATH = "yolov8s.pt"
+MODEL_PATH = "models/yolo/yolov8s.pt"
 model = YOLO(MODEL_PATH)
 
 def detect_objects(image_path: str) -> list:
