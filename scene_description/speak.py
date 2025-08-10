@@ -13,8 +13,9 @@ def speak(text):
     #         break
     #     elif "english" in voice.name.lower():
     #         engine.setProperty('voice', voice.id)
-
-    engine.setProperty('voice', 'com.apple.speech.synthesis.voice.daniel')  # or alex, fred, etc.        
+#
+    # engine.setProperty('voice', 'com.apple.speech.synthesis.voice.daniel')  # or alex, fred, etc.        
+    engine.setProperty('voice', 'com.apple.voice.compact.en-IN.Rishi → Rishi')  # or alex, fred, etc.        
     engine.setProperty('rate', 180)  # Speed
     engine.setProperty('volume', 1.0)  # Volume
 
@@ -22,7 +23,7 @@ def speak(text):
     engine.runAndWait()
 
 # for listing of voices present
-# import pyttsx3
-# engine = pyttsx3.init()
-# for v in engine.getProperty('voices'):
-#     print(f"{v.id} → {v.name}")
+import pyttsx3
+engine = pyttsx3.init()
+for v in engine.getProperty('voices'):
+    print(f"{v.id} → {v.name}")
