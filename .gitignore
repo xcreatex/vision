@@ -6,3 +6,5 @@ weights/
 *.pth
 models/
 weights/
+yolov8s.pt
+models/yolo/*.pt
