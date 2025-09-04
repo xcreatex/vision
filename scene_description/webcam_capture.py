@@ -26,4 +26,3 @@ def capture_image():
     print(f"✅ Image saved at: {image_path} | Saved: {saved}")
 
     return image_path
-
