@@ -67,10 +67,10 @@ def main():
 
     while True:
         try:
-            # print("🎧 Listening for command...")
-            # command = listen_for_command()
+            print("🎧 Listening for command...")
+            command = listen_for_command()
             # Simulate a text input instead of voice
-            command = input("📝 Enter a simulated voice command: ")
+            # command = input("📝 Enter a simulated voice command: ")
 
             if command_matches(command):
                 print("📸 Capturing image...")

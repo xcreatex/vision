@@ -1,10 +1,11 @@
-*.pt
-*.pt
-models/
-weights/
+# Ignore PyTorch model weights
 *.pt
 *.pth
+
+# Ignore model and weight directories
 models/
 weights/
+
+# Ignore specific YOLO weights
 yolov8s.pt
 models/yolo/*.pt
