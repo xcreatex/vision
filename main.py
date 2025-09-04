@@ -4,7 +4,7 @@ from scene_description.webcam_capture import capture_image
 from scene_description.describe_scene import describe_image
 from scene_description.speak import speak
 from scene_description.listen_vosk import listen_for_command
-from scene_description.detect_objects import detect_objects
+from scene_description.detect_objects import YOLODetector
 from rapidfuzz import fuzz
 
 # Clean up old images
@@ -20,7 +20,10 @@ def clear_old_images(folder="captured_images"):
                 print(f"⚠️ Could not delete {file_name}: {e}")
 
 # List of acceptable activation words (common variants/mishearings)
-ACTIVATION_WORDS = ["robot", "robit", "robort", "rabot", "rawbot", "rowbot", "assistant", "asistantat","AI","ai","ei"]
+ACTIVATION_WORDS = [
+    "robot", "robit", "robort", "rabot", "rawbot", "rowbot",
+    "assistant", "asistantat", "ai", "ei"
+]
 
 # Phrases that indicate the user wants a command to be run
 TRIGGER_PHRASES = [
@@ -60,17 +63,20 @@ def command_matches(text):
     print("❌ No matching trigger phrase found.")
     return False
 
+
 def main():
     clear_old_images()
     print("🎬 Voice-triggered scene assistant started (offline mode with Vosk).")
     print("🎤 Say something like 'describe', 'what do you see', or 'capture again'...\n")
 
+    detector = YOLODetector()
+
     while True:
         try:
-            print("🎧 Listening for command...")
-            command = listen_for_command()
-            # Simulate a text input instead of voice
-            # command = input("📝 Enter a simulated voice command: ")
+            # print("🎧 Listening for command...")
+            # command = listen_for_command()
+            # For testing, you can simulate:
+            command = input("📝 Enter a simulated voice command: ")
 
             if command_matches(command):
                 print("📸 Capturing image...")
@@ -82,11 +88,29 @@ def main():
                 print(f"🖼️ Scene Description: {description}")
 
                 print("🔍 Detecting objects...")
-                detected_objects = detect_objects(image_path)
-                if detected_objects:
-                    objects_text = ", ".join(detected_objects)
-                    print(f"📦 Detected objects: {objects_text}")
-                    full_response = f"{description}. I can also see: {objects_text}."
+                regions = detector.detect(image_path)
+
+                if any(regions.values()):  # if something detected
+                    left_objs = [obj[0] for obj in regions["left"]]
+                    center_objs = [obj[0] for obj in regions["center"]]
+                    right_objs = [obj[0] for obj in regions["right"]]
+
+                    objects_text = []
+                    if left_objs: objects_text.append(f"on the left: {', '.join(left_objs)}")
+                    if center_objs: objects_text.append(f"in the center: {', '.join(center_objs)}")
+                    if right_objs: objects_text.append(f"on the right: {', '.join(right_objs)}")
+
+                    region_summary = " | ".join(objects_text)
+                    print(f"📦 Detected objects → {region_summary}")
+
+                    # Guidance: suggest movement if important object not centered
+                    guidance = ""
+                    if left_objs and not center_objs:
+                        guidance = f"You may move slightly right to center {', '.join(left_objs)}."
+                    elif right_objs and not center_objs:
+                        guidance = f"You may move slightly left to center {', '.join(right_objs)}."
+
+                    full_response = f"{description}. I see {region_summary}. {guidance}"
                 else:
                     print("📦 No objects detected.")
                     full_response = description
@@ -103,6 +127,7 @@ def main():
         except Exception as e:
             print(f"❌ Error: {e}")
             time.sleep(3)
+
 
 if __name__ == "__main__":
     main()
