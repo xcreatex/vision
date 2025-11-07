@@ -1,3 +1,4 @@
+# scene_description/yolo_detector.py
 from ultralytics import YOLO
 import cv2
 
@@ -5,29 +6,37 @@ class YOLODetector:
     def __init__(self, model_path="models/yolo/yolov8s.pt"):
         self.model = YOLO(model_path)
 
-    def detect(self, image_path):
+    def detect_detailed(self, image_path, conf=0.45, imgsz=640):
         """
-        Detect objects and split them into left/center/right lists.
-        Returns a dict: {"left": [...], "center": [...], "right": [...]}
+        Returns a detailed list of detections:
+        [{label, conf, region, bbox(x1,y1,x2,y2)}]
         """
-        results = self.model(image_path)[0]
-        width = results.orig_shape[1]  # image width
-        region_size = width // 3
+        results = self.model.predict(image_path, conf=conf, imgsz=imgsz, verbose=False)
+        frame = cv2.imread(image_path)
+        h, w = frame.shape[:2]
+        one_third = w // 3
 
-        regions = {"left": [], "center": [], "right": []}
-
-        for box in results.boxes:
+        detailed = []
+        for box in results[0].boxes:
             cls_id = int(box.cls[0])
             label = self.model.names[cls_id]
-            confidence = float(box.conf[0])
+            conf_score = float(box.conf[0])
             x1, y1, x2, y2 = box.xyxy[0].tolist()
+
+            # Determine region (left, center, right)
             center_x = (x1 + x2) / 2
-
-            if center_x < region_size:
-                regions["left"].append((label, confidence))
-            elif center_x < 2 * region_size:
-                regions["center"].append((label, confidence))
+            if center_x < one_third:
+                region = "left"
+            elif center_x < 2 * one_third:
+                region = "center"
             else:
-                regions["right"].append((label, confidence))
+                region = "right"
 
-        return regions
+            detailed.append({
+                "label": label,
+                "conf": conf_score,
+                "region": region,
+                "bbox": (x1, y1, x2, y2)
+            })
+
+        return detailed
